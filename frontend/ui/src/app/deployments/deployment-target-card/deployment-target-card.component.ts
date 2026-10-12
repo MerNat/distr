@@ -35,6 +35,7 @@ import {
   faGauge,
   faGear,
   faLink,
+  faLinkSlash,
   faPen,
   faPlus,
   faPowerOff,
@@ -151,6 +152,7 @@ export class DeploymentTargetCardComponent {
   protected readonly faGauge = faGauge;
   protected readonly faGear = faGear;
   protected readonly faLink = faLink;
+  protected readonly faLinkSlash = faLinkSlash;
   protected readonly faPen = faPen;
   protected readonly faPlus = faPlus;
   protected readonly faPowerOff = faPowerOff;
@@ -632,9 +634,7 @@ export class DeploymentTargetCardComponent {
     if (dt.reportedControllerVersionId !== undefined) {
       const message =
         `If you continue, a new authentication secret for ${dt.name} is issued. ` +
-        'The current secret stays valid until a controller connects to Distr with the new one.' +
-        (dt.reconnectPending ? ' The connect command issued before becomes invalid.' : '') +
-        ' Continue?';
+        'The current secret stays valid until a controller connects to Distr with the new one. Continue?';
       const alert =
         dt.customerOrganization !== undefined && this.auth.isVendor()
           ? ({type: 'info', message: this.customerManagedNotice} as const)
@@ -644,6 +644,37 @@ export class DeploymentTargetCardComponent {
       }
     }
     this.showModal(this.instructionsModal());
+  }
+
+  protected async cancelReconnect() {
+    const dt = this.deploymentTarget();
+    const message =
+      `If you continue, the pending secret for ${dt.name} is deleted and the connect command issued with it ` +
+      'stops working. The current secret stays valid, so the running controller keeps working. Continue?';
+    const alert =
+      dt.customerOrganization !== undefined && this.auth.isVendor()
+        ? ({type: 'warning', message: this.customerManagedWarning} as const)
+        : undefined;
+    if (
+      !(await firstValueFrom(
+        this.overlay.confirm({
+          message: {message, alert},
+          confirmLabel: 'Cancel reconnect',
+          cancelLabel: 'Keep reconnect',
+        })
+      ))
+    ) {
+      return;
+    }
+    try {
+      await firstValueFrom(this.deploymentTargets.cancelReconnect(dt.id!));
+      this.toast.success(`The reconnect of ${dt.name} has been canceled`);
+    } catch (e) {
+      const msg = getFormDisplayedError(e);
+      if (msg) {
+        this.toast.error(msg);
+      }
+    }
   }
 
   protected showModal(templateRef: TemplateRef<unknown>) {
