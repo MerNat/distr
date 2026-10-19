@@ -250,6 +250,15 @@ export default defineConfig({
                   ],
                 },
                 {
+                  label: 'Amazon Elastic Container Service (ECS)',
+                  items: [
+                    {
+                      label: 'Deploying to Amazon ECS',
+                      link: '/docs/integrations/aws-ecs/',
+                    },
+                  ],
+                },
+                {
                   label: 'API & SDK',
                   items: [
                     {label: 'Distr API', link: '/docs/integrations/api/'},
