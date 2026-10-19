@@ -9,11 +9,15 @@ import icon from 'astro-icon';
 import {defineConfig, fontProviders} from 'astro/config';
 import rehypeExternalLinks from 'rehype-external-links';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
+import {llmsTxtOptions} from './src/llms-txt/options';
+
+const site = 'https://distr.sh';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://distr.sh',
+  site,
   prefetch: {
     prefetchAll: true,
   },
@@ -308,6 +312,7 @@ export default defineConfig({
             'http://localhost:**',
           ],
         }),
+        starlightLlmsTxt(llmsTxtOptions(site)),
       ],
     }),
     mdx(),
